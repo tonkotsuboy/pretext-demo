@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>リアルタイムリフロー — @chenglou/pretext</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <nav class="demo-nav">
+    <a href="./">&larr; デモ一覧</a>
+    <span class="demo-nav-title">リアルタイムリフロー</span>
+  </nav>
+  <section class="section">
+    <div class="section-header">
+      <h2>リアルタイムリフロー</h2>
+      <p class="section-desc">スライダーで幅を変更。Pretextが瞬時に再計算。</p>
+    </div>
+    <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
+
+// prepare()は初回のみ。layout()は何度呼んでも高速
+const prepared = prepare(text, font)       // 一度だけ
+const result = layout(prepared, width, 28) // ← 0.00xms で完了</code></pre>
+    <div class="reflow-demo">
+      <input type="range" id="width-slider" min="120" max="800" value="400">
+      <div class="reflow-info">
+        <span id="reflow-width">400px</span>
+        <span id="reflow-lines">— 行</span>
+        <span id="reflow-time">— ms</span>
+      </div>
+      <div class="reflow-box" id="reflow-box"></div>
+    </div>
+  </section>
+  <script type="module" src="/reflow.js"></script>
+</body>
+</html>

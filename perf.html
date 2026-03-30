@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>パフォーマンス比較 — @chenglou/pretext</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <nav class="demo-nav">
+    <a href="./">&larr; デモ一覧</a>
+    <span class="demo-nav-title">パフォーマンス比較</span>
+  </nav>
+  <section class="section">
+    <div class="section-header">
+      <h2>パフォーマンス比較</h2>
+      <p class="section-desc">「テキストが何行になるか、高さは何pxか」を知る2つの方法を比較します。</p>
+    </div>
+    <div class="perf-explain">
+      <div class="explain-card">
+        <h4>DOM計測（従来）</h4>
+        <p>非表示のdivにテキストを入れて <code>offsetHeight</code> を読む。<br>ブラウザは毎回「レイアウトリフロー」（ページ全体の配置再計算）を強制実行するため、500回繰り返すと重い。</p>
+      </div>
+      <div class="explain-card accent">
+        <h4>Pretext（Canvas計測）</h4>
+        <p><code>prepare()</code> でCanvas APIを使い文字幅を事前キャッシュ（初回のみ）。<br><code>layout()</code> はキャッシュ済みの数値で足し算するだけ。DOMに一切触らないので桁違いに速い。</p>
+      </div>
+    </div>
+    <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
+
+// Pretext: 2ステップで高さ取得
+const prepared = prepare(text, '16px "Noto Sans JP"')  // 初回のみ
+const { height, lineCount } = layout(prepared, 300, 28) // 算術計算のみ</code></pre>
+    <div class="perf-demo">
+      <button id="run-bench" class="btn">ベンチマーク実行 — 500テキストの高さ計測</button>
+      <div class="perf-results" id="perf-results"></div>
+      <div class="perf-bars" id="perf-bars"></div>
+    </div>
+  </section>
+  <script type="module" src="/perf.js"></script>
+</body>
+</html>

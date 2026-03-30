@@ -7,6 +7,11 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: "index.html",
+        perf: "perf.html",
+        masonry: "masonry.html",
+        bubbles: "bubbles.html",
+        canvasDemo: "canvas-demo.html",
+        reflow: "reflow.html",
         ascii: "ascii.html",
         editorial: "editorial.html",
       },

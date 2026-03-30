@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>チャットバブル — @chenglou/pretext</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <nav class="demo-nav">
+    <a href="./">&larr; デモ一覧</a>
+    <span class="demo-nav-title">チャットバブル</span>
+  </nav>
+  <section class="section">
+    <div class="section-header">
+      <h2>チャットバブル — fit-content比較</h2>
+      <p class="section-desc">CSSの <code>width: fit-content</code> は最長行に合わせるだけ。Pretextは行数を維持したまま最小幅に縮める（shrinkwrap）。</p>
+    </div>
+    <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
+
+// 行数を維持したまま最小幅を二分探索
+const base = layout(prepared, maxWidth, 24)
+let lo = 60, hi = maxWidth, bestW = maxWidth
+while (lo &lt;= hi) {
+  const mid = (lo + hi) &gt;&gt; 1
+  layout(prepared, mid, 24).lineCount &lt;= base.lineCount
+    ? (bestW = mid, hi = mid - 1) : (lo = mid + 1)
+}</code></pre>
+    <div class="bubble-controls">
+      <label>最大幅: <input type="range" id="bubble-width-slider" min="150" max="500" value="320"><span id="bubble-width-value">320px</span></label>
+    </div>
+    <div class="bubble-comparison">
+      <div class="bubble-col">
+        <h4 class="bubble-col-title">CSS fit-content</h4>
+        <div class="chat-container" id="chat-css"></div>
+      </div>
+      <div class="bubble-col">
+        <h4 class="bubble-col-title accent">Pretext shrinkwrap</h4>
+        <div class="chat-container" id="chat-pretext"></div>
+      </div>
+    </div>
+  </section>
+  <script type="module" src="/bubbles.js"></script>
+</body>
+</html>

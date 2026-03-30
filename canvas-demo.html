@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canvas直接描画 — @chenglou/pretext</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <nav class="demo-nav">
+    <a href="./">&larr; デモ一覧</a>
+    <span class="demo-nav-title">Canvas直接描画</span>
+  </nav>
+  <section class="section">
+    <div class="section-header">
+      <h2>Canvas直接描画</h2>
+      <p class="section-desc">layoutNextLineで取得した行データをCanvasに直接描画。障害物の回り込みも。</p>
+    </div>
+    <pre class="code-block"><code class="language-javascript">import { prepareWithSegments, layoutNextLine } from "@chenglou/pretext"
+
+// 1行ずつレイアウト。幅を変えれば障害物の回り込みが可能
+const prepared = prepareWithSegments(text, font)
+let cursor = { segmentIndex: 0, graphemeIndex: 0 }
+while (true) {
+  const width = isObstructed(y) ? narrowWidth : fullWidth
+  const line = layoutNextLine(prepared, cursor, width)
+  if (!line) break
+  ctx.fillText(line.text, x, y)
+  cursor = line.end; y += lineHeight
+}</code></pre>
+    <div class="canvas-wrapper">
+      <canvas id="text-canvas" width="800" height="500"></canvas>
+    </div>
+  </section>
+  <script type="module" src="/canvas-demo.js"></script>
+</body>
+</html>

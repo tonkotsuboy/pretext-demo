@@ -19,153 +19,48 @@
     </div>
   </header>
 
-  <!-- Showcase Links -->
-  <section class="section showcase-links">
-    <div class="showcase-grid">
-      <a href="./ascii.html" class="showcase-card">
-        <span class="showcase-label">DEMO</span>
-        <h3>タイポグラフィックASCIIアート</h3>
-        <p>パーティクルシミュレーションの明暗を日本語文字で表現。プロポーショナルフォントの文字幅をPretextで計測。</p>
-      </a>
-      <a href="./editorial.html" class="showcase-card">
-        <span class="showcase-label">DEMO</span>
+  <section class="section">
+    <div class="showcase-grid full">
+      <a href="./editorial.html" class="showcase-card featured">
+        <span class="showcase-label">INTERACTIVE</span>
         <h3>エディトリアルエンジン</h3>
         <p>アニメーションする球体を避けながらテキストがリアルタイムでリフロー。毎フレームDOMリフローゼロ。</p>
       </a>
-    </div>
-  </section>
-
-  <!-- Demo 1: Performance -->
-  <section class="section" id="perf">
-    <div class="section-header">
-      <span class="section-num">01</span>
-      <h2>パフォーマンス比較</h2>
-      <p class="section-desc">「テキストが何行になるか、高さは何pxか」を知る2つの方法を比較します。</p>
-    </div>
-    <div class="perf-explain">
-      <div class="explain-card">
-        <h4>DOM計測（従来）</h4>
-        <p>非表示のdivにテキストを入れて <code>offsetHeight</code> を読む。<br>ブラウザは毎回「レイアウトリフロー」（ページ全体の配置再計算）を強制実行するため、500回繰り返すと重い。</p>
-      </div>
-      <div class="explain-card accent">
-        <h4>Pretext（Canvas計測）</h4>
-        <p><code>prepare()</code> でCanvas APIを使い文字幅を事前キャッシュ（初回のみ）。<br><code>layout()</code> はキャッシュ済みの数値で足し算するだけ。DOMに一切触らないので桁違いに速い。</p>
-      </div>
-    </div>
-    <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
-
-// Pretext: 2ステップで高さ取得
-const prepared = prepare(text, '16px "Noto Sans JP"')  // 初回のみ
-const { height, lineCount } = layout(prepared, 300, 28) // 算術計算のみ</code></pre>
-    <div class="perf-demo">
-      <button id="run-bench" class="btn">ベンチマーク実行 — 500テキストの高さ計測</button>
-      <div class="perf-results" id="perf-results"></div>
-      <div class="perf-bars" id="perf-bars"></div>
-    </div>
-  </section>
-
-  <!-- Demo 2: Masonry -->
-  <section class="section" id="masonry">
-    <div class="section-header">
-      <span class="section-num">02</span>
-      <h2>Masonryレイアウト</h2>
-      <p class="section-desc">DOMに触れずにカード高さを予測。リサイズしてみてください。</p>
-    </div>
-    <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
-
-// カードの高さをDOMなしで予測
-const prepared = prepare(text, '14px "Noto Sans JP"')
-const { height } = layout(prepared, cardWidth, 24)
-// → この height でMasonryの配置を計算</code></pre>
-    <div class="masonry-controls">
-      <label>カラム数: <input type="range" id="col-slider" min="2" max="6" value="4"><span id="col-count">4</span></label>
-    </div>
-    <div class="masonry-container" id="masonry-container"></div>
-  </section>
-
-  <!-- Demo 3: Chat Bubbles -->
-  <section class="section" id="bubbles">
-    <div class="section-header">
-      <span class="section-num">03</span>
-      <h2>チャットバブル — fit-content比較</h2>
-      <p class="section-desc">CSSの <code>width: fit-content</code> は最長行に合わせるだけ。Pretextは行数を維持したまま最小幅に縮める（shrinkwrap）。</p>
-    </div>
-    <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
-
-// 行数を維持したまま最小幅を二分探索
-const base = layout(prepared, maxWidth, 24)
-let lo = 60, hi = maxWidth, bestW = maxWidth
-while (lo &lt;= hi) {
-  const mid = (lo + hi) &gt;&gt; 1
-  layout(prepared, mid, 24).lineCount &lt;= base.lineCount
-    ? (bestW = mid, hi = mid - 1) : (lo = mid + 1)
-}</code></pre>
-    <div class="bubble-controls">
-      <label>最大幅: <input type="range" id="bubble-width-slider" min="150" max="500" value="320"><span id="bubble-width-value">320px</span></label>
-    </div>
-    <div class="bubble-comparison">
-      <div class="bubble-col">
-        <h4 class="bubble-col-title">CSS fit-content</h4>
-        <div class="chat-container" id="chat-css"></div>
-      </div>
-      <div class="bubble-col">
-        <h4 class="bubble-col-title accent">Pretext shrinkwrap</h4>
-        <div class="chat-container" id="chat-pretext"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Demo 4: Canvas Rendering -->
-  <section class="section" id="canvas">
-    <div class="section-header">
-      <span class="section-num">04</span>
-      <h2>Canvas直接描画</h2>
-      <p class="section-desc">layoutWithLinesで取得した行データをCanvasに直接描画。障害物の回り込みも。</p>
-    </div>
-    <pre class="code-block"><code class="language-javascript">import { prepareWithSegments, layoutNextLine } from "@chenglou/pretext"
-
-// 1行ずつレイアウト。幅を変えれば障害物の回り込みが可能
-const prepared = prepareWithSegments(text, font)
-let cursor = { segmentIndex: 0, graphemeIndex: 0 }
-while (true) {
-  const width = isObstructed(y) ? narrowWidth : fullWidth
-  const line = layoutNextLine(prepared, cursor, width)
-  if (!line) break
-  ctx.fillText(line.text, x, y)
-  cursor = line.end; y += lineHeight
-}</code></pre>
-    <div class="canvas-wrapper">
-      <canvas id="text-canvas" width="800" height="500"></canvas>
-    </div>
-  </section>
-
-  <!-- Demo 5: Live Reflow -->
-  <section class="section" id="reflow">
-    <div class="section-header">
-      <span class="section-num">05</span>
-      <h2>リアルタイムリフロー</h2>
-      <p class="section-desc">スライダーで幅を変更。Pretextが瞬時に再計算。</p>
-    </div>
-    <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
-
-// prepare()は初回のみ。layout()は何度呼んでも高速
-const prepared = prepare(text, font)       // 一度だけ
-const result = layout(prepared, width, 28) // ← 0.00xms で完了</code></pre>
-    <div class="reflow-demo">
-      <input type="range" id="width-slider" min="120" max="800" value="400">
-      <div class="reflow-info">
-        <span id="reflow-width">400px</span>
-        <span id="reflow-lines">— 行</span>
-        <span id="reflow-time">— ms</span>
-      </div>
-      <div class="reflow-box" id="reflow-box"></div>
+      <a href="./ascii.html" class="showcase-card featured">
+        <span class="showcase-label">INTERACTIVE</span>
+        <h3>タイポグラフィックASCIIアート</h3>
+        <p>パーティクルシミュレーションの明暗を日本語文字で表現。プロポーショナルフォントの文字幅をPretextで計測。</p>
+      </a>
+      <a href="./perf.html" class="showcase-card">
+        <span class="showcase-label">BENCHMARK</span>
+        <h3>パフォーマンス比較</h3>
+        <p>500個のテキストブロック高さ計測。DOM vs Pretext。</p>
+      </a>
+      <a href="./masonry.html" class="showcase-card">
+        <span class="showcase-label">LAYOUT</span>
+        <h3>Masonryレイアウト</h3>
+        <p>DOMに触れずにカード高さを予測。カラム数変更対応。</p>
+      </a>
+      <a href="./bubbles.html" class="showcase-card">
+        <span class="showcase-label">COMPARISON</span>
+        <h3>チャットバブル</h3>
+        <p>CSS fit-content vs Pretext shrinkwrap。最適幅の比較。</p>
+      </a>
+      <a href="./canvas-demo.html" class="showcase-card">
+        <span class="showcase-label">RENDERING</span>
+        <h3>Canvas直接描画</h3>
+        <p>layoutNextLineで障害物を回り込むテキスト描画。</p>
+      </a>
+      <a href="./reflow.html" class="showcase-card">
+        <span class="showcase-label">REALTIME</span>
+        <h3>リアルタイムリフロー</h3>
+        <p>スライダーで幅を変更。Pretextが0.00xmsで再計算。</p>
+      </a>
     </div>
   </section>
 
   <footer class="footer">
     <p><a href="https://github.com/chenglou/pretext" target="_blank">GitHub: chenglou/pretext</a></p>
   </footer>
-
-  <script type="module" src="/main.js"></script>
 </body>
 </html>
