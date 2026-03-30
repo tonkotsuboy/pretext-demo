@@ -87,8 +87,8 @@ const { height } = layout(prepared, cardWidth, 24)
   <section class="section" id="bubbles">
     <div class="section-header">
       <span class="section-num">03</span>
-      <h2>チャットバブル — CSS比較</h2>
-      <p class="section-desc">同じテキストをCSSの <code>max-width</code> とPretextの最適化幅で比較。スライダーで最大幅を変更できます。</p>
+      <h2>チャットバブル — fit-content比較</h2>
+      <p class="section-desc">CSSの <code>width: fit-content</code> は最長行に合わせるだけ。Pretextは行数を維持したまま最小幅に縮める（shrinkwrap）。</p>
     </div>
     <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
 
@@ -105,11 +105,11 @@ while (lo &lt;= hi) {
     </div>
     <div class="bubble-comparison">
       <div class="bubble-col">
-        <h4 class="bubble-col-title">CSS max-width（そのまま）</h4>
+        <h4 class="bubble-col-title">CSS fit-content</h4>
         <div class="chat-container" id="chat-css"></div>
       </div>
       <div class="bubble-col">
-        <h4 class="bubble-col-title accent">Pretext最適化幅</h4>
+        <h4 class="bubble-col-title accent">Pretext shrinkwrap</h4>
         <div class="chat-container" id="chat-pretext"></div>
       </div>
     </div>

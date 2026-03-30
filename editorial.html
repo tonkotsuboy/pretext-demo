@@ -98,6 +98,39 @@
       line-height: 1;
     }
 
+    .code-overlay {
+      position: fixed;
+      bottom: 60px;
+      left: 16px;
+      z-index: 100;
+    }
+    .code-toggle {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 6px 14px;
+      background: rgba(129, 140, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(129, 140, 248, 0.25);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .code-toggle:hover { background: rgba(129, 140, 248, 0.25); }
+    .code-panel {
+      display: none;
+      margin-top: 8px;
+      background: rgba(10, 10, 15, 0.95);
+      border: 1px solid rgba(129, 140, 248, 0.2);
+      border-radius: 10px;
+      padding: 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--accent);
+      max-width: 520px;
+      white-space: pre-wrap;
+    }
+    .code-panel.open { display: block; }
+
     .hint {
       position: fixed;
       bottom: 20px;
@@ -122,6 +155,28 @@
     <span class="info" id="layout-time">layout: --</span>
   </div>
   <div id="stage"></div>
+  <div class="code-overlay">
+    <button class="code-toggle" id="code-toggle">Code</button>
+    <pre class="code-panel" id="code-panel"><code>import { prepareWithSegments, layoutNextLine } from "@chenglou/pretext"
+
+// テキストを事前準備（1回だけ）
+const prepared = prepareWithSegments(bodyText, '16px "Noto Serif JP"')
+
+// 毎フレーム: 障害物を避けて1行ずつレイアウト
+let cursor = { segmentIndex: 0, graphemeIndex: 0 }
+while (y + lineH &lt;= regionBottom) {
+  // 球体との交差を計算 → 利用可能なスロットを算出
+  const blocked = orbs.map(o => circleBlockedInterval(o, y, y + lineH))
+  const slots = carveSlots(fullWidth, blocked)
+  for (const slot of slots) {
+    const line = layoutNextLine(prepared, cursor, slot.width)
+    if (!line) break
+    el.style.left = slot.left; el.textContent = line.text
+    cursor = line.end  // カーソルが列を跨いで引き継がれる
+  }
+  y += lineH
+}</code></pre>
+  </div>
   <div class="hint">球体をドラッグして動かせます。テキストがリアルタイムでリフローします。</div>
   <script type="module" src="/editorial.js"></script>
 </body>

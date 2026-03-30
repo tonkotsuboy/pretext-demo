@@ -217,9 +217,10 @@ function initChat() {
     const { side, text } = chatMessages[i];
     preparedBubbles.push(prepareWithSegments(text, bubbleFont));
 
-    // CSS side: create once
-    const cssMeta = el("div", { className: "bubble-meta", textContent: "CSS max-width" });
+    // CSS side: create once with fit-content
+    const cssMeta = el("div", { className: "bubble-meta", textContent: "fit-content" });
     const cssBubble = el("div", { className: `bubble ${side}` }, [text, cssMeta]);
+    cssBubble.style.width = "fit-content";
     cssContainer.appendChild(cssBubble);
     cssBubbleEls.push(cssBubble);
 
@@ -236,8 +237,9 @@ function updateChat(maxWidth) {
   const textMaxW = maxWidth - bubblePadding;
 
   for (let i = 0; i < chatMessages.length; i++) {
-    // CSS side: just update max-width
+    // CSS side: fit-content with max-width constraint
     cssBubbleEls[i].style.maxWidth = maxWidth + "px";
+    cssBubbleEls[i].style.width = "fit-content";
 
     // Pretext side: binary search for tight width
     const prepared = preparedBubbles[i];

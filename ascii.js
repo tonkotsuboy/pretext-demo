@@ -208,10 +208,16 @@ function updateSimulation() {
 }
 
 // ─── Source canvas rendering ───
+// Canvas draws in CSS pixel space matching the panel, but we need to
+// map particle coords (0-1) to the same visual region as the character grid.
+let canvasCSSWidth = 0;
+let canvasCSSHeight = 0;
+
 function renderSourceCanvas(canvas) {
   const ctx = canvas.getContext("2d");
-  const w = canvas.width;
-  const h = canvas.height;
+  const w = canvasCSSWidth;
+  const h = canvasCSSHeight;
+  ctx.clearRect(0, 0, w, h);
   ctx.fillStyle = "#05050a";
   ctx.fillRect(0, 0, w, h);
 
@@ -360,14 +366,39 @@ function loop() {
 // ─── Init ───
 async function init() {
   const canvas = document.getElementById("source-canvas");
-  const rect = canvas.parentElement.getBoundingClientRect();
+  const panel = canvas.parentElement;
+  const panelRect = panel.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
+
+  // Match canvas drawing area to character grid proportions
+  // Grid: COLS wide, ROWS * LINE_H tall
+  // Scale to fit within the panel
+  const gridAspect = COLS / ROWS;
+  const panelAspect = panelRect.width / panelRect.height;
+
+  if (panelAspect > gridAspect) {
+    // Panel is wider than grid — fit to height
+    canvasCSSHeight = panelRect.height;
+    canvasCSSWidth = canvasCSSHeight * gridAspect;
+  } else {
+    // Panel is taller than grid — fit to width
+    canvasCSSWidth = panelRect.width;
+    canvasCSSHeight = canvasCSSWidth / gridAspect;
+  }
+
+  canvas.width = canvasCSSWidth * dpr;
+  canvas.height = canvasCSSHeight * dpr;
+  canvas.style.width = canvasCSSWidth + "px";
+  canvas.style.height = canvasCSSHeight + "px";
   canvas.getContext("2d").scale(dpr, dpr);
 
   await buildPalette();
   initParticles();
+
+  document.getElementById("code-toggle").addEventListener("click", () => {
+    document.getElementById("code-panel").classList.toggle("open");
+  });
+
   requestAnimationFrame(loop);
 }
 

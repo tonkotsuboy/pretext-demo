@@ -381,6 +381,10 @@ async function init() {
 
   setupInteraction();
 
+  document.getElementById("code-toggle").addEventListener("click", () => {
+    document.getElementById("code-panel").classList.toggle("open");
+  });
+
   window.addEventListener("resize", () => {
     // Clamp orbs
     for (const orb of orbs) {

@@ -68,13 +68,16 @@
       color: var(--dim);
       z-index: 2;
     }
+    .panel:first-child {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     #source-canvas {
-      width: 100%;
-      height: 100%;
       display: block;
     }
     #proportional-output, #monospace-output {
-      padding: 32px 12px 12px;
+      padding: 32px 8px 12px;
       line-height: 15px;
       font-size: 12px;
       white-space: pre;
@@ -104,6 +107,39 @@
     .a9 { opacity: 0.9; }
     .a10 { opacity: 1.0; }
 
+    .code-overlay {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      z-index: 20;
+    }
+    .code-toggle {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 6px 14px;
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--accent2);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .code-toggle:hover { background: rgba(99, 102, 241, 0.3); }
+    .code-panel {
+      display: none;
+      margin-top: 8px;
+      background: rgba(10, 10, 20, 0.95);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 10px;
+      padding: 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.7;
+      color: #a78bfa;
+      max-width: 480px;
+      white-space: pre-wrap;
+    }
+    .code-panel.open { display: block; }
+
     @media (max-width: 900px) {
       .panels { grid-template-columns: 1fr 1fr; }
       .panel:first-child { display: none; }
@@ -115,6 +151,20 @@
     <a href="./">&larr; 戻る</a>
     <span class="title">タイポグラフィックASCIIアート</span>
     <span class="info" id="fps-counter">-- fps</span>
+  </div>
+  <div class="code-overlay" id="code-overlay">
+    <button class="code-toggle" id="code-toggle">Code</button>
+    <pre class="code-panel" id="code-panel"><code>import { prepareWithSegments } from "@chenglou/pretext"
+
+// Pretextで各文字の幅を計測（プロポーショナルフォント対応）
+function measureWidth(ch, font) {
+  const prepared = prepareWithSegments(ch, font)
+  return prepared.widths[0] ?? 0
+}
+
+// 明るさに応じた文字を選択（二分探索）
+// 幅の近さも加味してプロポーショナル配置を維持
+const entry = findCharByBrightness(fieldValue * 255)</code></pre>
   </div>
   <div class="panels">
     <div class="panel">
