@@ -7,6 +7,7 @@ import {
   setLocale,
 } from "@chenglou/pretext";
 
+
 setLocale("ja");
 
 const FONT = '16px "Noto Sans JP"';
@@ -195,27 +196,63 @@ function buildMasonry() {
   container.style.height = Math.max(...colHeights) + "px";
 }
 
-// ─── Demo 3: Chat Bubbles ───
-function buildChat() {
-  const container = document.getElementById("chat-container");
-  const fragment = document.createDocumentFragment();
+// ─── Demo 3: Chat Bubbles (CSS vs Pretext comparison) ───
+function buildChat(maxWidth) {
+  const cssContainer = document.getElementById("chat-css");
+  const ptContainer = document.getElementById("chat-pretext");
+  const cssFragment = document.createDocumentFragment();
+  const ptFragment = document.createDocumentFragment();
+
+  const bubbleFont = '14px "Noto Sans JP"';
+  const bubblePadding = 32; // horizontal padding total
+  const lineH = 24;
 
   for (let i = 0; i < chatMessages.length; i++) {
     const { side, text } = chatMessages[i];
-    const prepared = prepare(text, '14px "Noto Sans JP"');
-    const { lineCount, height } = layout(prepared, 320, 24);
 
-    const bubble = el("div", {
+    // CSS version: just max-width, browser decides
+    const cssBubble = el("div", {
       className: `bubble ${side}`,
-      style: `animation-delay:${i * 120}ms`,
+      style: `max-width:${maxWidth}px`,
     }, [
       text,
-      el("div", { className: "bubble-meta", textContent: `${lineCount}行 / 高さ ${height}px (Pretext算出)` }),
+      el("div", { className: "bubble-meta", textContent: "CSS max-width" }),
     ]);
-    fragment.appendChild(bubble);
+    cssFragment.appendChild(cssBubble);
+
+    // Pretext version: find optimal narrower width
+    const prepared = prepareWithSegments(text, bubbleFont);
+    const textMaxW = maxWidth - bubblePadding;
+    const baseResult = layoutWithLines(prepared, textMaxW, lineH);
+
+    // Binary search for minimum width that keeps same line count
+    let lo = 60;
+    let hi = textMaxW;
+    let bestW = textMaxW;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      const { lineCount } = layout(prepared, mid, lineH);
+      if (lineCount <= baseResult.lineCount) {
+        bestW = mid;
+        hi = mid - 1;
+      } else {
+        lo = mid + 1;
+      }
+    }
+
+    const optResult = layout(prepared, bestW, lineH);
+    const ptBubble = el("div", {
+      className: `bubble ${side}`,
+      style: `max-width:${bestW + bubblePadding}px`,
+    }, [
+      text,
+      el("div", { className: "bubble-meta", textContent: `${optResult.lineCount}行 / 幅${bestW + bubblePadding}px (Pretext最適化)` }),
+    ]);
+    ptFragment.appendChild(ptBubble);
   }
 
-  container.replaceChildren(fragment);
+  cssContainer.replaceChildren(cssFragment);
+  ptContainer.replaceChildren(ptFragment);
 }
 
 // ─── Demo 4: Canvas Rendering ───
@@ -333,13 +370,19 @@ async function init() {
   document.getElementById("run-bench").addEventListener("click", runBenchmark);
 
   buildMasonry();
-  buildChat();
+  buildChat(320);
   drawCanvas();
   updateReflow();
 
   document.getElementById("col-slider").addEventListener("input", (e) => {
     document.getElementById("col-count").textContent = e.target.value;
     buildMasonry();
+  });
+
+  document.getElementById("bubble-width-slider").addEventListener("input", (e) => {
+    const w = parseInt(e.target.value);
+    document.getElementById("bubble-width-value").textContent = w + "px";
+    buildChat(w);
   });
 
   document.getElementById("width-slider").addEventListener("input", updateReflow);
