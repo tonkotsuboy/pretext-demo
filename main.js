@@ -199,42 +199,56 @@ function buildMasonry() {
 }
 
 // ─── Demo 3: Chat Bubbles (CSS vs Pretext comparison) ───
-function buildChat(maxWidth) {
+const bubbleFont = '14px "Noto Sans JP"';
+const bubblePadding = 32;
+const bubbleLineH = 24;
+
+// Pre-prepare all bubble texts (once)
+let preparedBubbles = [];
+let cssBubbleEls = [];
+let ptBubbleEls = [];
+let ptMetaEls = [];
+
+function initChat() {
   const cssContainer = document.getElementById("chat-css");
   const ptContainer = document.getElementById("chat-pretext");
-  const cssFragment = document.createDocumentFragment();
-  const ptFragment = document.createDocumentFragment();
-
-  const bubbleFont = '14px "Noto Sans JP"';
-  const bubblePadding = 32; // horizontal padding total
-  const lineH = 24;
 
   for (let i = 0; i < chatMessages.length; i++) {
     const { side, text } = chatMessages[i];
+    preparedBubbles.push(prepareWithSegments(text, bubbleFont));
 
-    // CSS version: just max-width, browser decides
-    const cssBubble = el("div", {
-      className: `bubble ${side}`,
-      style: `max-width:${maxWidth}px`,
-    }, [
-      text,
-      el("div", { className: "bubble-meta", textContent: "CSS max-width" }),
-    ]);
-    cssFragment.appendChild(cssBubble);
+    // CSS side: create once
+    const cssMeta = el("div", { className: "bubble-meta", textContent: "CSS max-width" });
+    const cssBubble = el("div", { className: `bubble ${side}` }, [text, cssMeta]);
+    cssContainer.appendChild(cssBubble);
+    cssBubbleEls.push(cssBubble);
 
-    // Pretext version: find optimal narrower width
-    const prepared = prepareWithSegments(text, bubbleFont);
-    const textMaxW = maxWidth - bubblePadding;
-    const baseResult = layoutWithLines(prepared, textMaxW, lineH);
+    // Pretext side: create once
+    const ptMeta = el("div", { className: "bubble-meta" });
+    const ptBubble = el("div", { className: `bubble ${side}` }, [text, ptMeta]);
+    ptContainer.appendChild(ptBubble);
+    ptBubbleEls.push(ptBubble);
+    ptMetaEls.push(ptMeta);
+  }
+}
 
-    // Binary search for minimum width that keeps same line count
+function updateChat(maxWidth) {
+  const textMaxW = maxWidth - bubblePadding;
+
+  for (let i = 0; i < chatMessages.length; i++) {
+    // CSS side: just update max-width
+    cssBubbleEls[i].style.maxWidth = maxWidth + "px";
+
+    // Pretext side: binary search for tight width
+    const prepared = preparedBubbles[i];
+    const baseLineCount = layout(prepared, textMaxW, bubbleLineH).lineCount;
+
     let lo = 60;
     let hi = textMaxW;
     let bestW = textMaxW;
     while (lo <= hi) {
       const mid = (lo + hi) >> 1;
-      const { lineCount } = layout(prepared, mid, lineH);
-      if (lineCount <= baseResult.lineCount) {
+      if (layout(prepared, mid, bubbleLineH).lineCount <= baseLineCount) {
         bestW = mid;
         hi = mid - 1;
       } else {
@@ -242,19 +256,11 @@ function buildChat(maxWidth) {
       }
     }
 
-    const optResult = layout(prepared, bestW, lineH);
-    const ptBubble = el("div", {
-      className: `bubble ${side}`,
-      style: `max-width:${bestW + bubblePadding}px`,
-    }, [
-      text,
-      el("div", { className: "bubble-meta", textContent: `${optResult.lineCount}行 / 幅${bestW + bubblePadding}px (Pretext最適化)` }),
-    ]);
-    ptFragment.appendChild(ptBubble);
+    const tightWidth = bestW + bubblePadding;
+    ptBubbleEls[i].style.maxWidth = tightWidth + "px";
+    ptBubbleEls[i].style.width = tightWidth + "px";
+    ptMetaEls[i].textContent = `${baseLineCount}行 / 幅${tightWidth}px (Pretext最適化)`;
   }
-
-  cssContainer.replaceChildren(cssFragment);
-  ptContainer.replaceChildren(ptFragment);
 }
 
 // ─── Demo 4: Canvas Rendering ───
@@ -372,7 +378,8 @@ async function init() {
   document.getElementById("run-bench").addEventListener("click", runBenchmark);
 
   buildMasonry();
-  buildChat(320);
+  initChat();
+  updateChat(320);
   drawCanvas();
   updateReflow();
 
@@ -384,7 +391,7 @@ async function init() {
   document.getElementById("bubble-width-slider").addEventListener("input", (e) => {
     const w = parseInt(e.target.value);
     document.getElementById("bubble-width-value").textContent = w + "px";
-    buildChat(w);
+    updateChat(w);
   });
 
   document.getElementById("width-slider").addEventListener("input", updateReflow);
