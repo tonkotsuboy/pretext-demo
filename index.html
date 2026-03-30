@@ -52,7 +52,9 @@
         <p><code>prepare()</code> でCanvas APIを使い文字幅を事前キャッシュ（初回のみ）。<br><code>layout()</code> はキャッシュ済みの数値で足し算するだけ。DOMに一切触らないので桁違いに速い。</p>
       </div>
     </div>
-    <pre class="code-block"><code>// Pretext: 2ステップで高さ取得
+    <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
+
+// Pretext: 2ステップで高さ取得
 const prepared = prepare(text, '16px "Noto Sans JP"')  // 初回のみ
 const { height, lineCount } = layout(prepared, 300, 28) // 算術計算のみ</code></pre>
     <div class="perf-demo">
@@ -69,7 +71,9 @@ const { height, lineCount } = layout(prepared, 300, 28) // 算術計算のみ</c
       <h2>Masonryレイアウト</h2>
       <p class="section-desc">DOMに触れずにカード高さを予測。リサイズしてみてください。</p>
     </div>
-    <pre class="code-block"><code>// カードの高さをDOMなしで予測
+    <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
+
+// カードの高さをDOMなしで予測
 const prepared = prepare(text, '14px "Noto Sans JP"')
 const { height } = layout(prepared, cardWidth, 24)
 // → この height でMasonryの配置を計算</code></pre>
@@ -86,7 +90,9 @@ const { height } = layout(prepared, cardWidth, 24)
       <h2>チャットバブル — CSS比較</h2>
       <p class="section-desc">同じテキストをCSSの <code>max-width</code> とPretextの最適化幅で比較。スライダーで最大幅を変更できます。</p>
     </div>
-    <pre class="code-block"><code>// 行数を維持したまま最小幅を二分探索
+    <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
+
+// 行数を維持したまま最小幅を二分探索
 const base = layout(prepared, maxWidth, 24)
 let lo = 60, hi = maxWidth, bestW = maxWidth
 while (lo &lt;= hi) {
@@ -116,7 +122,10 @@ while (lo &lt;= hi) {
       <h2>Canvas直接描画</h2>
       <p class="section-desc">layoutWithLinesで取得した行データをCanvasに直接描画。障害物の回り込みも。</p>
     </div>
-    <pre class="code-block"><code>// layoutNextLine: 1行ずつレイアウト。幅を変えれば障害物の回り込みが可能
+    <pre class="code-block"><code class="language-javascript">import { prepareWithSegments, layoutNextLine } from "@chenglou/pretext"
+
+// 1行ずつレイアウト。幅を変えれば障害物の回り込みが可能
+const prepared = prepareWithSegments(text, font)
 let cursor = { segmentIndex: 0, graphemeIndex: 0 }
 while (true) {
   const width = isObstructed(y) ? narrowWidth : fullWidth
@@ -137,7 +146,9 @@ while (true) {
       <h2>リアルタイムリフロー</h2>
       <p class="section-desc">スライダーで幅を変更。Pretextが瞬時に再計算。</p>
     </div>
-    <pre class="code-block"><code>// prepare()は初回のみ。layout()は何度呼んでも高速
+    <pre class="code-block"><code class="language-javascript">import { prepare, layout } from "@chenglou/pretext"
+
+// prepare()は初回のみ。layout()は何度呼んでも高速
 const prepared = prepare(text, font)       // 一度だけ
 const result = layout(prepared, width, 28) // ← 0.00xms で完了</code></pre>
     <div class="reflow-demo">

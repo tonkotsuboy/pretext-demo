@@ -7,6 +7,8 @@ import {
   setLocale,
 } from "@chenglou/pretext";
 
+import Prism from "prismjs";
+import "prismjs/themes/prism-tomorrow.css";
 
 setLocale("ja");
 
@@ -395,6 +397,8 @@ async function init() {
       drawCanvas();
     }, 100);
   });
+
+  Prism.highlightAll();
 }
 
 init();
