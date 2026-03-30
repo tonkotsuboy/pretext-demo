@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@chenglou/pretext Demo — 日本語テキストレイアウト</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-tag">@chenglou/pretext</p>
+      <h1>DOM不要の<br>テキスト計測</h1>
+      <p class="hero-sub">Canvas APIによる高速テキストレイアウト。<br>リフローゼロ。日本語完全対応。</p>
+    </div>
+  </header>
+
+  <!-- Showcase Links -->
+  <section class="section showcase-links">
+    <div class="showcase-grid">
+      <a href="/ascii.html" class="showcase-card">
+        <span class="showcase-label">DEMO</span>
+        <h3>タイポグラフィックASCIIアート</h3>
+        <p>パーティクルシミュレーションの明暗を日本語文字で表現。プロポーショナルフォントの文字幅をPretextで計測。</p>
+      </a>
+      <a href="/editorial.html" class="showcase-card">
+        <span class="showcase-label">DEMO</span>
+        <h3>エディトリアルエンジン</h3>
+        <p>アニメーションする球体を避けながらテキストがリアルタイムでリフロー。毎フレームDOMリフローゼロ。</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Demo 1: Performance -->
+  <section class="section" id="perf">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>パフォーマンス比較</h2>
+      <p class="section-desc">「テキストが何行になるか、高さは何pxか」を知る2つの方法を比較します。</p>
+    </div>
+    <div class="perf-explain">
+      <div class="explain-card">
+        <h4>DOM計測（従来）</h4>
+        <p>非表示のdivにテキストを入れて <code>offsetHeight</code> を読む。<br>ブラウザは毎回「レイアウトリフロー」（ページ全体の配置再計算）を強制実行するため、500回繰り返すと重い。</p>
+      </div>
+      <div class="explain-card accent">
+        <h4>Pretext（Canvas計測）</h4>
+        <p><code>prepare()</code> でCanvas APIを使い文字幅を事前キャッシュ（初回のみ）。<br><code>layout()</code> はキャッシュ済みの数値で足し算するだけ。DOMに一切触らないので桁違いに速い。</p>
+      </div>
+    </div>
+    <div class="perf-demo">
+      <button id="run-bench" class="btn">ベンチマーク実行 — 500テキストの高さ計測</button>
+      <div class="perf-results" id="perf-results"></div>
+      <div class="perf-bars" id="perf-bars"></div>
+    </div>
+  </section>
+
+  <!-- Demo 2: Masonry -->
+  <section class="section" id="masonry">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>Masonryレイアウト</h2>
+      <p class="section-desc">DOMに触れずにカード高さを予測。リサイズしてみてください。</p>
+    </div>
+    <div class="masonry-controls">
+      <label>カラム数: <input type="range" id="col-slider" min="2" max="6" value="4"><span id="col-count">4</span></label>
+    </div>
+    <div class="masonry-container" id="masonry-container"></div>
+  </section>
+
+  <!-- Demo 3: Chat Bubbles -->
+  <section class="section" id="bubbles">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>チャットバブル</h2>
+      <p class="section-desc">メッセージ幅を最適化。行数に応じた最小幅を計算。</p>
+    </div>
+    <div class="chat-container" id="chat-container"></div>
+  </section>
+
+  <!-- Demo 4: Canvas Rendering -->
+  <section class="section" id="canvas">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>Canvas直接描画</h2>
+      <p class="section-desc">layoutWithLinesで取得した行データをCanvasに直接描画。障害物の回り込みも。</p>
+    </div>
+    <div class="canvas-wrapper">
+      <canvas id="text-canvas" width="800" height="500"></canvas>
+    </div>
+  </section>
+
+  <!-- Demo 5: Live Reflow -->
+  <section class="section" id="reflow">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>リアルタイムリフロー</h2>
+      <p class="section-desc">スライダーで幅を変更。Pretextが瞬時に再計算。</p>
+    </div>
+    <div class="reflow-demo">
+      <input type="range" id="width-slider" min="120" max="800" value="400">
+      <div class="reflow-info">
+        <span id="reflow-width">400px</span>
+        <span id="reflow-lines">— 行</span>
+        <span id="reflow-time">— ms</span>
+      </div>
+      <div class="reflow-box" id="reflow-box"></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p><a href="https://github.com/chenglou/pretext" target="_blank">GitHub: chenglou/pretext</a></p>
+  </footer>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>

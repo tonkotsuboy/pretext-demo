@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>エディトリアルエンジン — @chenglou/pretext</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Serif+JP:wght@300;500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a0a0f;
+      --text: #e0e0ec;
+      --dim: #5a5a72;
+      --accent: #818cf8;
+      --accent2: #c084fc;
+      --accent3: #34d399;
+      --serif: "Noto Serif JP", serif;
+      --sans: "Noto Sans JP", sans-serif;
+      --mono: "IBM Plex Mono", monospace;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--serif);
+      overflow: hidden;
+      height: 100vh;
+      cursor: default;
+      -webkit-font-smoothing: antialiased;
+    }
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(129, 140, 248, 0.12);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+    .top-bar a { color: var(--accent); text-decoration: none; }
+    .top-bar a:hover { text-decoration: underline; }
+    .top-bar .info { color: var(--dim); }
+
+    #stage {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      padding-top: 40px;
+      overflow: hidden;
+    }
+
+    .text-line {
+      position: absolute;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: clip;
+    }
+
+    .headline-line {
+      position: absolute;
+      font-family: var(--sans);
+      font-weight: 900;
+      white-space: nowrap;
+      background: linear-gradient(135deg, #e0e0ec, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: none;
+    }
+
+    .pull-quote {
+      position: absolute;
+      font-family: var(--sans);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--accent);
+      border-left: 3px solid var(--accent);
+      padding-left: 16px;
+    }
+
+    .drop-cap {
+      position: absolute;
+      font-family: var(--serif);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .hint {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--dim);
+      background: rgba(10, 10, 15, 0.85);
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(129, 140, 248, 0.12);
+      z-index: 100;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="/">&larr; 戻る</a>
+    <span class="title">エディトリアルエンジン</span>
+    <span class="info" id="layout-time">layout: --</span>
+  </div>
+  <div id="stage"></div>
+  <div class="hint">球体をドラッグして動かせます。テキストがリアルタイムでリフローします。</div>
+  <script type="module" src="/editorial.js"></script>
+</body>
+</html>
